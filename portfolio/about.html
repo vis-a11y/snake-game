@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me - Vishal Portfolio</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="about.css">
+</head>
+<body>
+
+    <!-- Scroll Progress Indicator -->
+    <div id="scroll-progress"></div>
+
+    <!-- Header (Dynamically Injected via app.js) -->
+    <header id="header"></header>
+
+    <!-- About Section -->
+    <section id="about">
+        
+        <div class="about-container">
+            
+            <div class="about-heading" style="text-align: center; margin-bottom: 50px; width: 100%;">
+                <h4>Discover Info</h4>
+                <h2 class="gradient-text" style="font-size: 3rem;">About Me</h2>
+            </div>
+            
+            <div class="about-layout-wrapper">
+                <!-- Left Portrait -->
+                <div class="about-image-wrapper">
+                    <div class="about-image">
+                        <img src="images/profile.jpg" alt="Vishal Prajapati Developer Profile">
+                    </div>
+                </div>
+                
+                <!-- Right Info Content -->
+                <div class="about-content">
+                    <div class="about-text glass-card" style="padding: 30px; border-radius: 20px; margin-bottom: 30px;">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">Who is Vishal?</h3>
+                        <p>
+                            Hello! I'm <strong>Vishal Prajapati</strong>, a highly driven and creative full stack developer located in Mumbai, India. I am passionate about constructing complex, fast-loading, and visually spectacular websites and web applications.
+                        </p>
+                        <p>
+                            I specialize in modular frontend technologies (HTML5, CSS3, modern ES6+ JavaScript, React) alongside robust and scalable backend systems (Node.js, Express, relational SQL systems, and NoSQL databases). I take immense pride in turning abstract concepts into elegant, functional realities.
+                        </p>
+                    </div>
+                    
+                    <!-- Quick Info Grid -->
+                    <div class="about-info">
+                        <div class="info-box glass-card">
+                            <span>Name:</span>
+                            <p>Vishal Prajapati</p>
+                        </div>
+                        
+                        <div class="info-box glass-card">
+                            <span>Email:</span>
+                            <p>vishal@gmail.com</p>
+                        </div>
+                        
+                        <div class="info-box glass-card">
+                            <span>Experience:</span>
+                            <p>Full Stack Engineer</p>
+                        </div>
+                        
+                        <div class="info-box glass-card">
+                            <span>Location:</span>
+                            <p>Mumbai, India</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-action" style="margin-top: 35px;">
+                        <a href="#" class="btn btn-primary" onclick="showReadMore(event)">
+                            <i class="fas fa-info-circle"></i> Read More Credentials
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+    </section>
+
+    <!-- Core Controller Scripts -->
+    <script src="app.js"></script>
+    <script>
+        function showReadMore(e) {
+            e.preventDefault();
+            showToast("Vishal has built over 15 full stack projects and is open to collaborations!", "info");
+        }
+    </script>
+</body>
+</html>

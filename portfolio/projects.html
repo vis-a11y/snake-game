@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects - Vishal Portfolio</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="projects.css">
+</head>
+<body>
+
+    <!-- Scroll Progress Indicator -->
+    <div id="scroll-progress"></div>
+
+    <!-- Header (Dynamically Injected via app.js) -->
+    <header id="header"></header>
+
+    <!-- Projects Section -->
+    <section id="projects">
+
+        <div class="projects-wrapper">
+            <div class="project-heading">
+                <h4>My Creative Portfolio</h4>
+                <h2 class="gradient-text">Latest Projects</h2>
+            </div>
+
+            <!-- Project Addition Form (Only visible to Admin) -->
+            <div class="project-form glass-card" style="display: none;">
+                <!-- Title is dynamically injected if missing -->
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="projectTitle">Project Title</label>
+                        <input type="text" id="projectTitle" class="form-control" placeholder="E.g., Crypto Dashboard">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectImage">Cover Image URL</label>
+                        <input type="text" id="projectImage" class="form-control" placeholder="E.g., https://unsplash.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectVideo">Video Demo URL (Optional)</label>
+                        <input type="text" id="projectVideo" class="form-control" placeholder="E.g., https://youtube.com/...">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="projectGithub">GitHub Repository Link</label>
+                        <input type="text" id="projectGithub" class="form-control" placeholder="E.g., https://github.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectDemo">Live Deployment Link</label>
+                        <input type="text" id="projectDemo" class="form-control" placeholder="E.g., https://app.vercel.app">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="projectDescription">Project Description</label>
+                    <textarea id="projectDescription" class="form-control" placeholder="Describe features, architectural stack, and problem solved..."></textarea>
+                </div>
+
+                <button onclick="addProject()" class="btn btn-primary" style="align-self: flex-start; margin-top: 10px;">
+                    <i class="fas fa-plus"></i> Publish Project
+                </button>
+            </div>
+
+            <!-- Projects Grid Container (Populated dynamically) -->
+            <div id="projects-container"></div>
+        </div>
+
+    </section>
+
+    <!-- Core Controller Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
