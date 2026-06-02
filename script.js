@@ -40,11 +40,11 @@ let snake = [
 function initializeBoard() {
   cols = Math.floor(board.clientWidth / blockWidth);
   rows = Math.floor(board.clientHeight / blockHeight);
-  
+
   // Clear existing blocks
   board.innerHTML = "";
   Object.keys(blocks).forEach((key) => delete blocks[key]);
-  
+
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const block = document.createElement("div");
@@ -55,7 +55,7 @@ function initializeBoard() {
       blocks[`${row},${col}`] = block;
     }
   }
-  
+
   // Initialize food position
   food = {
     x: Math.floor(Math.random() * rows),
@@ -154,7 +154,7 @@ function gameLoop() {
   renderSnake();
 }
 
-// direction control
+// direction control - keyboard
 addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") {
     direction = "left";
@@ -164,6 +164,45 @@ addEventListener("keydown", (e) => {
     direction = "up";
   } else if (e.key === "ArrowDown") {
     direction = "down";
+  }
+});
+
+// direction control - touch swipe
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener("touchstart", (e) => {
+  touchStartX = e.changedTouches[0].clientX;
+  touchStartY = e.changedTouches[0].clientY;
+});
+
+document.addEventListener("touchend", (e) => {
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+
+  const diffX = touchStartX - touchEndX;
+  const diffY = touchStartY - touchEndY;
+  const swipeThreshold = 30;
+
+  // Determine swipe direction
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    // Horizontal swipe
+    if (diffX > swipeThreshold) {
+      // Swiped left
+      direction = "left";
+    } else if (diffX < -swipeThreshold) {
+      // Swiped right
+      direction = "right";
+    }
+  } else {
+    // Vertical swipe
+    if (diffY > swipeThreshold) {
+      // Swiped up
+      direction = "up";
+    } else if (diffY < -swipeThreshold) {
+      // Swiped down
+      direction = "down";
+    }
   }
 });
 
