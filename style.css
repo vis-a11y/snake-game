@@ -51,6 +51,18 @@ main {
   min-height: 620px;
 }
 
+@media (max-width: 768px) {
+  .game-wrapper {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .infos {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
 .infos {
   display: flex;
   flex-direction: column;
@@ -78,8 +90,7 @@ main {
     inset 0 0 0 1px rgba(255, 255, 255, 0.03),
     0 18px 40px rgba(0, 0, 0, 0.35);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-  grid-auto-rows: 40px;
+  /* Grid template is now handled securely by JavaScript */
   gap: 4px;
   min-height: 620px;
   width: 100%;

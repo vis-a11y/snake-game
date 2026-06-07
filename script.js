@@ -17,22 +17,40 @@ let rows = 0;
 let blocks = {};
 let snake = [];
 let food = { x: 0, y: 0 };
+
 let direction = "right";
 let nextDirection = "right";
+
 let score = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 let secondsElapsed = 0;
+
 let intervalId = null;
 let timeIntervalId = null;
 
-highScoreElement.innerText = highScore;
-scoreElement.innerText = score;
-timeElement.innerText = formatTime(secondsElapsed);
+let gameSpeed = 120;
+
+if (highScoreElement) {
+  highScoreElement.innerText = highScore;
+}
+
+if (scoreElement) {
+  scoreElement.innerText = score;
+}
+
+if (timeElement) {
+  timeElement.innerText = "00:00";
+}
 
 function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+  return `${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 function getRandomPosition() {
@@ -43,144 +61,273 @@ function getRandomPosition() {
 }
 
 function placeFood() {
-  let position = getRandomPosition();
-  while (snake.some((segment) => segment.x === position.x && segment.y === position.y)) {
-    position = getRandomPosition();
+  const availableCells = [];
+
+  for (let x = 0; x < rows; x++) {
+    for (let y = 0; y < cols; y++) {
+      const occupied = snake.some(
+        (segment) =>
+          segment.x === x &&
+          segment.y === y
+      );
+
+      if (!occupied) {
+        availableCells.push({ x, y });
+      }
+    }
   }
-  return position;
+
+  if (!availableCells.length) {
+    endGame();
+    return { x: 0, y: 0 };
+  }
+
+  return availableCells[
+    Math.floor(
+      Math.random() * availableCells.length
+    )
+  ];
 }
 
 function initializeBoard() {
-  cols = Math.floor((board.clientWidth + boardGap) / (blockWidth + boardGap));
-  rows = Math.floor((board.clientHeight + boardGap) / (blockHeight + boardGap));
+  if (!board) return;
 
-  if (cols < 5 || rows < 5) {
-    return;
-  }
+  cols = Math.floor(
+    (board.clientWidth + boardGap) /
+      (blockWidth + boardGap)
+  );
+
+  rows = Math.floor(
+    (board.clientHeight + boardGap) /
+      (blockHeight + boardGap)
+  );
+
+  if (isNaN(cols) || cols < 10) cols = 10;
+  if (isNaN(rows) || rows < 10) rows = 10;
 
   board.innerHTML = "";
   blocks = {};
 
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      const block = document.createElement("div");
+  board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const block =
+        document.createElement("div");
+
       block.className = "block";
       block.dataset.pos = `${row},${col}`;
+
       board.appendChild(block);
+
       blocks[`${row},${col}`] = block;
     }
   }
 }
 
-function resetGame() {
-  if (!board || !startBtn || !restartBtn) return;
+function renderBoard() {
+  Object.values(blocks).forEach((block) => {
+    if (block) {
+      block.classList.remove(
+        "fill",
+        "food"
+      );
+    }
+  });
 
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
+  snake.forEach((segment) => {
+    const snakeBlock =
+      blocks[`${segment.x},${segment.y}`];
+
+    if (snakeBlock) {
+      snakeBlock.classList.add("fill");
+    }
+  });
+
+  const foodBlock =
+    blocks[`${food.x},${food.y}`];
+
+  if (foodBlock) {
+    foodBlock.classList.add("food");
   }
-  if (timeIntervalId) {
-    clearInterval(timeIntervalId);
-    timeIntervalId = null;
+}
+
+function showModal(showGameOver = false) {
+  if (
+    !modal ||
+    !startPanel ||
+    !gameOverPanel
+  )
+    return;
+
+  modal.style.display = "flex";
+
+  if (showGameOver) {
+    startPanel.style.display = "none";
+    gameOverPanel.style.display = "flex";
+  } else {
+    startPanel.style.display = "flex";
+    gameOverPanel.style.display = "none";
   }
+}
+
+function hideModal() {
+  if (!modal) return;
+
+  modal.style.display = "none";
+}
+
+function endGame() {
+  clearInterval(intervalId);
+  clearInterval(timeIntervalId);
+
+  intervalId = null;
+  timeIntervalId = null;
+
+  showModal(true);
+}
+
+function resetGame() {
+  clearInterval(intervalId);
+  clearInterval(timeIntervalId);
+
+  intervalId = null;
+  timeIntervalId = null;
 
   score = 0;
   secondsElapsed = 0;
+
+  gameSpeed = 400;
+
   direction = "right";
   nextDirection = "right";
-  scoreElement.innerText = score;
-  timeElement.innerText = formatTime(secondsElapsed);
-  highScoreElement.innerText = highScore;
+
+  if (scoreElement) {
+    scoreElement.innerText = score;
+  }
+
+  if (timeElement) {
+    timeElement.innerText =
+      formatTime(secondsElapsed);
+  }
 
   initializeBoard();
+
   snake = [
     {
       x: Math.floor(rows / 2),
       y: Math.floor(cols / 2),
     },
   ];
+
   food = placeFood();
+
   renderBoard();
-  showModal(false);
 
-  intervalId = setInterval(gameLoop, 220);
+  intervalId = setInterval(
+    gameLoop,
+    gameSpeed
+  );
+
   timeIntervalId = setInterval(() => {
-    secondsElapsed += 1;
-    timeElement.innerText = formatTime(secondsElapsed);
-  }, 1000);
-}
+    secondsElapsed++;
 
-function showModal(showOver = false) {
-  if (!modal) return;
-  modal.style.display = "flex";
-  startPanel.style.display = showOver ? "none" : "flex";
-  gameOverPanel.style.display = showOver ? "flex" : "none";
-}
-
-function hideModal() {
-  if (!modal) return;
-  modal.style.display = "none";
-}
-
-function renderBoard() {
-  Object.values(blocks).forEach((block) => {
-    block.classList.remove("fill", "food");
-  });
-
-  snake.forEach((segment) => {
-    const block = blocks[`${segment.x},${segment.y}`];
-    if (block) {
-      block.classList.add("fill");
+    if (timeElement) {
+      timeElement.innerText =
+        formatTime(secondsElapsed);
     }
-  });
-
-  const foodBlock = blocks[`${food.x},${food.y}`];
-  if (foodBlock) {
-    foodBlock.classList.add("food");
-  }
-}
-
-function endGame() {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-  if (timeIntervalId) {
-    clearInterval(timeIntervalId);
-    timeIntervalId = null;
-  }
-  showModal(true);
+  }, 1000);
 }
 
 function gameLoop() {
   if (!snake.length) return;
 
   direction = nextDirection;
+
   const head = { ...snake[0] };
 
-  if (direction === "left") head.y -= 1;
-  if (direction === "right") head.y += 1;
-  if (direction === "up") head.x -= 1;
-  if (direction === "down") head.x += 1;
+  switch (direction) {
+    case "left":
+      head.y--;
+      break;
 
-  const hitWall = head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols;
-  const hitSelf = snake.some((segment) => segment.x === head.x && segment.y === head.y);
+    case "right":
+      head.y++;
+      break;
+
+    case "up":
+      head.x--;
+      break;
+
+    case "down":
+      head.x++;
+      break;
+  }
+
+  const hitWall =
+    head.x < 0 ||
+    head.x >= rows ||
+    head.y < 0 ||
+    head.y >= cols;
+
+  const body = snake.slice(
+    0,
+    snake.length - 1
+  );
+
+  const hitSelf = body.some(
+    (segment) =>
+      segment.x === head.x &&
+      segment.y === head.y
+  );
+
   if (hitWall || hitSelf) {
     endGame();
     return;
   }
 
-  const ateFood = head.x === food.x && head.y === food.y;
   snake.unshift(head);
+
+  const ateFood =
+    head.x === food.x &&
+    head.y === food.y;
 
   if (ateFood) {
     score += 10;
-    scoreElement.innerText = score;
+
+    if (scoreElement) {
+      scoreElement.innerText = score;
+    }
+
     if (score > highScore) {
       highScore = score;
-      highScoreElement.innerText = highScore;
-      localStorage.setItem("highScore", highScore);
+
+      if (highScoreElement) {
+        highScoreElement.innerText =
+          highScore;
+      }
+
+      localStorage.setItem(
+        "highScore",
+        highScore
+      );
     }
+
+    if (
+      score % 50 === 0 &&
+      gameSpeed > 50
+    ) {
+      gameSpeed -= 10;
+
+      clearInterval(intervalId);
+
+      intervalId = setInterval(
+        gameLoop,
+        gameSpeed
+      );
+    }
+
     food = placeFood();
   } else {
     snake.pop();
@@ -190,27 +337,89 @@ function gameLoop() {
 }
 
 function handleKeydown(event) {
-  const allowedKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
-  if (!allowedKeys.includes(event.key) || !intervalId) return;
+  if (!intervalId) return;
 
-  if (event.key === "ArrowLeft" && direction !== "right") nextDirection = "left";
-  if (event.key === "ArrowRight" && direction !== "left") nextDirection = "right";
-  if (event.key === "ArrowUp" && direction !== "down") nextDirection = "up";
-  if (event.key === "ArrowDown" && direction !== "up") nextDirection = "down";
+  switch (event.key) {
+    case "ArrowLeft":
+      if (direction !== "right") {
+        nextDirection = "left";
+      }
+      break;
+
+    case "ArrowRight":
+      if (direction !== "left") {
+        nextDirection = "right";
+      }
+      break;
+
+    case "ArrowUp":
+      if (direction !== "down") {
+        nextDirection = "up";
+      }
+      break;
+
+    case "ArrowDown":
+      if (direction !== "up") {
+        nextDirection = "down";
+      }
+      break;
+  }
 }
 
-window.addEventListener("resize", initializeBoard);
-window.addEventListener("keydown", handleKeydown);
+window.addEventListener(
+  "keydown",
+  handleKeydown
+);
 
-startBtn.addEventListener("click", () => {
-  hideModal();
-  resetGame();
-});
+window.addEventListener(
+  "resize",
+  () => {
+    if (!intervalId) {
+      initializeBoard();
 
-restartBtn.addEventListener("click", () => {
-  hideModal();
-  resetGame();
-});
+      if (snake.length) {
+        renderBoard();
+      }
+    }
+  }
+);
 
-initializeBoard();
-renderBoard();
+if (startBtn) {
+  startBtn.addEventListener(
+    "click",
+    () => {
+      hideModal();
+      resetGame();
+    }
+  );
+}
+
+if (restartBtn) {
+  restartBtn.addEventListener(
+    "click",
+    () => {
+      hideModal();
+      resetGame();
+    }
+  );
+}
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    initializeBoard();
+
+    snake = [
+      {
+        x: Math.floor(rows / 2),
+        y: Math.floor(cols / 2),
+      },
+    ];
+
+    food = placeFood();
+
+    renderBoard();
+
+    showModal(false);
+  }
+);
