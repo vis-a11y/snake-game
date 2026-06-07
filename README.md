@@ -126,3 +126,10 @@ High score is saved to `localStorage` under the key `"highScore"` and restored o
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+
+
+
+The project made by vishal prajapati
+
+
